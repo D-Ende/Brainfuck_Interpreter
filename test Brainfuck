@@ -1,0 +1,118 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+var scanner = bufio.NewScanner(os.Stdin)
+var input uint8
+var pointer int
+var programm [30000]uint8
+var brainfuckcode string
+var code string
+
+func main() {
+
+	fmt.Println("Enter youre BrainFuck code and let the magic begin (:")
+	// scanner.Scan()
+	// brainfuckcode = string(scanner.Text())
+	brainfuckcode = "+++[>+++++<-]>>+++++<<.>.>."
+	i := 0
+
+	for {
+
+		code = string(brainfuckcode[i])
+
+		if code == "<" {
+
+			pointer--
+			if pointer == 0 {
+				pointer = 30000
+			}
+			i++
+		} else if code == ">" {
+			pointer++
+			if pointer == 30000 {
+				pointer = 0
+			}
+			i++
+
+		} else if code == "+" {
+
+			programm[pointer]++
+			if programm[pointer] == 255 {
+				programm[pointer] = 0
+			}
+			i++
+
+		} else if code == "-" {
+
+			programm[pointer]--
+			if programm[pointer] == 0 {
+				programm[pointer] = 255
+			}
+			i++
+		} else if code == "[" {
+
+			if programm[pointer] == 0 {
+				count := 0
+
+				for i < len(brainfuckcode) {
+					if code == "]" && count == 0 {
+						break
+					} else if code == "[" {
+						count++
+					} else if code == "]" {
+						count--
+					} else {
+						i++
+					}
+
+				}
+			}
+			i++
+
+		} else if code == "]" {
+
+			if programm[pointer] != 0 {
+				count := 0
+				i--
+
+				for i > 0 {
+					if code == "[" && count == 0 {
+						break
+					} else if code == "]" {
+						count--
+					} else {
+						i--
+					}
+				}
+			}
+			i++
+
+		} else if code == "." {
+
+			fmt.Print(string(programm[pointer]))
+			i++
+
+		} else if code == "," {
+
+			scanner.Scan()
+			input = scanner.Bytes()[0]
+			programm[pointer] = input
+			i++
+
+		} else {
+			break
+		}
+	}
+	fmt.Println(programm[0])
+	fmt.Println(programm[1])
+	fmt.Println(programm[2])
+	fmt.Println(programm[3])
+	fmt.Println(programm[4])
+	fmt.Println("Tadaaa!")
+
+}
