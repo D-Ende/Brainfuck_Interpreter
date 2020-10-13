@@ -8,113 +8,131 @@ import (
 )
 
 var scanner = bufio.NewScanner(os.Stdin)
-var input uint8
-var pointer int           // obviously haha
-var programm [30000]uint8 // my array, the user code will in there
-var brainfuckcode string  // user code
+
+// Menu, choices to add Brainfuckcode
+func code() []byte {
+
+	fmt.Println("Do You want to write your own Brainfuck code or read a file? ")
+	fmt.Println("write Text or File")
+	scanner.Scan()
+
+	returns := make([]byte, 1000000)
+
+	if scanner.Text() == "Text" {
+		fmt.Println("Enter your Brainfuck code and let the magig begin (:")
+		scanner.Scan()
+		returns = scanner.Bytes()
+
+	} else if scanner.Text() == "File" {
+
+		code, err := ioutil.ReadFile("fileName.bf")
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %s\n", err)
+			os.Exit(-1)
+
+		}
+		returns = code
+	}
+	return returns
+}
 
 func main() {
 
-	pointer = 0
+	bfCode := code()
 
-	fmt.Println("Enter youre BrainFuck code and let the magic begin (:")
-	// fmt.Println("Do You want to write your own code or read a file? (Text or File)")
-	// scanner.Scan()
-	// choice := string(scanner.Text())
-
-	code, err := ioutil.ReadFile("fileName.bf")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %s\n", err)
-		os.Exit(-1)
-	}
-	brainfuckcode := code
-
-	//	scanner.Scan()
-	//	brainfuckcode = string(scanner.Text())
+	programm := make([]byte, 30000) // my array, the user code will in there
+	prgPointer := 0
 
 	fmt.Println()
 
-	for i := 0; i < len(brainfuckcode); i++ {
+	for codePointer := 0; codePointer < len(bfCode); codePointer++ {
 
-		switch string(brainfuckcode[i]) {
-		case "<":
-			// eine zeile zurück
-			pointer--
-			if pointer == 30000 {
-				pointer = 0
-			}
-		case ">":
-			// zeile vor
-			pointer++
-			if pointer == 0 {
-				pointer = 30000
+		switch bfCode[codePointer] {
+
+		case 60: // Instruction "<"
+
+			if prgPointer != 29999 {
+				prgPointer--
+			} else if prgPointer == 29999 {
+				prgPointer = 0
 			}
 
-		case "+":
-			// zelle plus eins
-			programm[pointer]++
-			if programm[pointer] > 255 {
-				programm[pointer] = 0
+		case 62: // Instruction ">"
+
+			if prgPointer != 29999 {
+				prgPointer++
+			} else if prgPointer == 0 {
+				prgPointer = 0
 			}
 
-		case "-":
-			// Zelle minus eins
-			programm[pointer]--
-			if programm[pointer] < 0 {
-				programm[pointer] = 255
+		case 43: // Instruction "+"
+
+			if programm[prgPointer] != 255 {
+				programm[prgPointer]++
+			} else if programm[prgPointer] == 255 {
+				programm[prgPointer] = 0
 			}
-		case "[":
-			// loop anfang, wenn 0 raus
-			p := i
 
-			if programm[pointer] == 0 {
-				count := 0
+		case 45: // Instruction "-"
 
-				for p < len(brainfuckcode) {
-					if string(brainfuckcode[p]) == "]" && count == 0 && programm[pointer] == 0 {
-						i = p
+			if programm[prgPointer] != 0 {
+				programm[prgPointer]--
+			} else if programm[prgPointer] == 0 {
+				programm[prgPointer] = 255
+			}
+
+		case 91: // Instruction "["
+
+			if programm[prgPointer] == 0 {
+
+				loopCount := 0
+				codePointer++
+
+				for codePointer < len(bfCode) {
+					if bfCode[codePointer] == 93 && loopCount == 0 {
 						break
-					} else if string(brainfuckcode[p]) == "[" {
-						count++
-					} else if string(brainfuckcode[p]) == "]" {
-						count--
+					} else if bfCode[codePointer] == 91 {
+						loopCount++
+					} else if bfCode[codePointer] == 93 {
+						loopCount--
 					} else {
-						p++
+						codePointer++
 					}
 
 				}
 			}
 
-		case "]":
-			// loop ende, wenn nicht null zum aufang
-			if programm[pointer] != 0 {
-				count := 0
-				p := i
+		case 93: // Instruction "]"
 
-				p--
+			if programm[prgPointer] != 0 {
 
-				for p > 0 {
-					if string(brainfuckcode[p]) == "[" && count == 0 && programm[pointer] != 0 {
-						p--
-						i = p
+				loopCount := 0
+				codePointer--
+
+				for codePointer < len(bfCode) {
+					if bfCode[codePointer] == 91 && loopCount == 0 {
+						prgPointer--
 						break
-					} else if string(brainfuckcode[p]) == "]" {
-						count--
+					} else if bfCode[codePointer] == 91 {
+						loopCount--
+					} else if bfCode[codePointer] == 93 {
+						loopCount++
 					} else {
-						p--
+						codePointer--
 					}
 				}
 			}
 
-		case ".":
-			// output
-			fmt.Print(string(programm[pointer]))
-		case ",":
-			// input
+		case 46: // Instruction "."
 
+			fmt.Print(string(programm[prgPointer]))
+
+		case 44: // Instruction ","
+
+			fmt.Println("Please enter one character..")
 			scanner.Scan()
-			input = scanner.Bytes()[0]
-			programm[pointer] = input
+			programm[prgPointer] = scanner.Bytes()[0]
 		}
 
 	}
