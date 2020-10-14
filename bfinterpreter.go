@@ -93,10 +93,9 @@ func main() {
 						loopCount++
 					} else if bfCode[codePointer] == 93 {
 						loopCount--
-					} else {
-						codePointer++
 					}
 
+					codePointer++
 				}
 			}
 
@@ -114,9 +113,8 @@ func main() {
 						loopCount--
 					} else if bfCode[codePointer] == 93 {
 						loopCount++
-					} else {
-						codePointer--
 					}
+					codePointer--
 				}
 			}
 
