@@ -53,16 +53,16 @@ func main() {
 		switch bfCode[codePointer] {
 
 		case 60: // Instruction "<"
-			if prgPointer != 29999 {
+			if prgPointer != 0 {
 				prgPointer--
-			} else if prgPointer == 29999 {
-				prgPointer = 0
+			} else if prgPointer == 0 {
+				prgPointer = 29999
 			}
 
 		case 62: // Instruction ">"
 			if prgPointer != 29999 {
 				prgPointer++
-			} else if prgPointer == 0 {
+			} else if prgPointer == 29999 {
 				prgPointer = 0
 			}
 
