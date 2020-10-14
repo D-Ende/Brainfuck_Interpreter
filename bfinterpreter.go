@@ -17,14 +17,17 @@ func code() []byte {
 	fmt.Println("write Text or File")
 	scanner.Scan()
 
-	if scanner.Text() == "Text" {
+	if scanner.Text() == "Text" || scanner.Text() == "text" {
 		fmt.Println("Enter your Brainfuck code and let the magic begin (:")
 		scanner.Scan()
 		returns = scanner.Bytes()
 
-	} else if scanner.Text() == "File" {
+	} else if scanner.Text() == "File" || scanner.Text() == "file" {
 
-		code, err := ioutil.ReadFile("fileName.bf")
+		fmt.Println("Please enter your filepath")
+		scanner.Scan()
+
+		code, err := ioutil.ReadFile(scanner.Text())
 
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %s\n", err)
